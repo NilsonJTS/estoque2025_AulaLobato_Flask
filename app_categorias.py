@@ -26,18 +26,22 @@ def adicionar(engine: Engine):
             print("Categoria adicionada")
 
 
+def selecionar_categoria(session: Session):
+    sentenca = select(Categoria).order_by(Categoria.nome)
+    categorias = session.execute(sentenca).scalars()
+    dicionario = dict()
+    contador = 1
+    for c in categorias:
+        print(f"{contador}. {c.nome}")
+        dicionario[contador] = c.id
+        contador += 1
+    id = int(input("Digite o numero da categoria que deve ser alterada: "))
+    categoria = session.get_one(Categoria, dicionario[id])
+    return categoria
+
 def modificar(engine: Engine):
     with Session(engine) as session:
-        sentenca = select(Categoria).order_by(Categoria.nome)
-        categorias = session.execute(sentenca).scalars()
-        dicionario = dict()
-        contador = 1
-        for c in categorias:
-            print(f"{contador}. {c.nome}")
-            dicionario[contador]=c.id
-            contador += 1
-        id = int(input("Digite o numero da categoria que deve ser alterada: "))
-        categoria = session.get_one(Categoria, dicionario[id])
+        categoria = selecionar_categoria(session)
         nome = input("Novo nome da categoria: ")
         categoria.nome=nome
         try:
@@ -50,16 +54,7 @@ def modificar(engine: Engine):
 
 def remover(engine: Engine):
     with Session(engine) as session:
-        sentenca = select(Categoria).order_by(Categoria.nome)
-        categorias = session.execute(sentenca).scalars()
-        dicionario = dict()
-        contador = 1
-        for c in categorias:
-            print(f"{contador} - {c.nome}")
-            dicionario[contador]=c.id
-            contador += 1
-        id = int(input("Digite o numero da categoria que deve ser removida: "))
-        categoria = session.get_one(Categoria, dicionario[id])
+        categoria = selecionar_categoria(session)
         session.delete(categoria)
         try:
             session.commit()
