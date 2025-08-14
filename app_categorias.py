@@ -26,13 +26,13 @@ def adicionar(engine: Engine):
             print("Categoria adicionada")
 
 
-def selecionar_categoria(session: Session):
+def selecionar_categoria(session: Session) -> Categoria:
     sentenca = select(Categoria).order_by(Categoria.nome)
     categorias = session.execute(sentenca).scalars()
     dicionario = dict()
     contador = 1
     for c in categorias:
-        print(f"{contador}. {c.nome}")
+        print(f"{contador} - {c.nome}")
         dicionario[contador] = c.id
         contador += 1
     id = int(input("Digite o numero da categoria que deve ser alterada: "))
